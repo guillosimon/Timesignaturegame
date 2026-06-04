@@ -315,6 +315,7 @@
       text-align: center;
       padding: 20px;
       background: #111114;
+      z-index: 10;
     }
     #player-error.visible { display: flex; }
     #player-error a { color: var(--accent); text-decoration: underline; }
@@ -803,14 +804,14 @@ const SONGS = [
 
   // ── 6/8 ────────────────────────────────────────────
   {
-    id: 'glS7gYWHxGI',
-    title: 'House of the Rising Sun',
-    artist: 'The Animals',
+    id: 'WMJTycleWrc',
+    title: 'When Johnny Comes Marching Home',
+    artist: 'West Point Band',
     sig: '6/8',
-    explanation: 'The arpeggiated guitar flows in 6/8 — six eighth notes per bar, grouped as two sets of three, giving a rocking compound feel.',
+    explanation: 'This Civil War march is a textbook 6/8 — the galloping feel comes from two strong beats per bar, each divided into three.',
     hints: [
-      'Count: ONE-and-a-TWO-and-a. You\'ll feel two big beats, each internally divided into three.',
-      '6/8 has the same note count as 3/4 but accents beats 1 AND 4 — giving it a compound, swaying quality.',
+      'The rhythm gallops: ONE-and-a-TWO-and-a. Two main pulses, each felt as a group of three.',
+      '"When JOHN-ny comes MAR-ching home" — JOHN and MAR land on the two strong beats of 6/8.',
     ],
   },
   {
@@ -963,6 +964,9 @@ window.onYouTubeIframeAPIReady = function () {
 
 function loadVideo(id) {
   document.getElementById('player-error').classList.remove('visible');
+  // Restore iframe visibility for new video
+  const iframe = document.querySelector('#player-wrap iframe');
+  if (iframe) iframe.style.visibility = '';
   if (ytReady && ytPlayer) {
     ytPlayer.loadVideoById(id);
   } else {
@@ -974,6 +978,9 @@ function showPlayerError(song) {
   const el   = document.getElementById('player-error');
   const link = document.getElementById('player-error-link');
   if (song && link) link.href = 'https://www.youtube.com/watch?v=' + song.id;
+  // Hide the YT iframe so it doesn't cover the error message and link
+  const iframe = document.querySelector('#player-wrap iframe');
+  if (iframe) iframe.style.visibility = 'hidden';
   el.classList.add('visible');
 }
 
