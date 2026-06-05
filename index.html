@@ -1629,6 +1629,10 @@ function doLevelUp() {
   STATE.level++;
   STATE.xp = 0;
 
+  // Stop any playing audio
+  stopRhythm();
+  if (ytReady && ytPlayer) ytPlayer.stopVideo();
+
   buildAnswerButtons();
   updateHeader();
 
