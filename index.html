@@ -611,6 +611,52 @@
     /* ─── song meta hidden state ─────────────────────── */
     .song-hidden { color: var(--text-muted) !important; font-style: italic; font-weight: 400 !important; }
 
+    /* ─── level selector (intro) ────────────────────── */
+    #level-select-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      animation: fade-in-up 0.5s 0.18s var(--ease-out) both;
+    }
+    #level-select-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    #level-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      justify-content: center;
+      max-width: 320px;
+    }
+    .level-chip-btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 6px 11px;
+      border-radius: var(--r-pill);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .level-chip-btn.selected {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(232,201,109,0.1);
+    }
+    /* ─── penalty flash on wrong ────────────────────── */
+    @keyframes penalty-flash {
+      0%   { color: var(--error); }
+      100% { color: var(--text); }
+    }
+    .penalty { animation: penalty-flash 0.6s ease forwards; }
+
     /* ─── revealed song info in feedback ─────────────── */
     #feedback-song-reveal {
       display: none;
@@ -633,7 +679,12 @@
     <div id="intro-logo">BeatRead</div>
     <p id="intro-tagline">Can you hear the beat?</p>
     <p id="intro-desc">Train your ear to recognise time signatures<br>through generated rhythm patterns.</p>
-    <div style="height:28px"></div>
+    <div style="height:20px"></div>
+    <div id="level-select-wrap">
+      <div id="level-select-label">Start at level</div>
+      <div id="level-chips"></div>
+    </div>
+    <div style="height:20px"></div>
     <button class="btn-primary" id="btn-start" style="margin:0 32px;width:auto">
       Start Training
     </button>
@@ -1478,7 +1529,16 @@ function handleCorrect() {
 
 function handleWrong(sig) {
   STATE.streak = 0;
+  STATE.xp    = Math.max(0, STATE.xp - 1);
+  STATE.score = Math.max(0, STATE.score - 30);
   updateStreak();
+  updateHeader();
+
+  // Flash score red to signal penalty
+  const scoreEl = document.getElementById('score-display');
+  scoreEl.classList.remove('penalty');
+  void scoreEl.offsetWidth;
+  scoreEl.classList.add('penalty');
 
   const btn = document.querySelector(`.answer-btn[data-sig="${sig}"]`);
   if (btn) { btn.style.animation = ''; btn.classList.add('wrong'); btn.disabled = true; }
@@ -1488,7 +1548,7 @@ function handleWrong(sig) {
   if (STATE.hintsUsed < hints.length) {
     const hint = hints[STATE.hintsUsed];
     STATE.hintsUsed++;
-    showFeedback('hint', '💡 Hint ' + STATE.hintsUsed + ' of ' + hints.length, hint);
+    showFeedback('hint', '💡 Hint ' + STATE.hintsUsed + ' of ' + hints.length, hint + '\n−1 XP  −30 pts');
   } else {
     STATE.revealed = true;
     stopRhythm();
@@ -1592,9 +1652,27 @@ function startChallenge() {
   showScreen('challenge');
 }
 
+let startLevel = 1;
+
+function buildLevelChips() {
+  const wrap = document.getElementById('level-chips');
+  wrap.innerHTML = '';
+  LEVELS.forEach(lvl => {
+    const btn = document.createElement('button');
+    btn.className = 'level-chip-btn' + (lvl.level === startLevel ? ' selected' : '');
+    btn.textContent = lvl.level + ' · ' + lvl.title;
+    btn.addEventListener('click', () => {
+      startLevel = lvl.level;
+      document.querySelectorAll('.level-chip-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+    wrap.appendChild(btn);
+  });
+}
+
 function startGame() {
   Object.assign(STATE, {
-    level: 1, xp: 0, score: 0, streak: 0,
+    level: startLevel, xp: 0, score: 0, streak: 0,
     currentSong: null, currentSig: null,
     hintsUsed: 0, answeredCorrectly: false, revealed: false,
     seenSongIds: new Set(), lastSongSig: null,
@@ -1603,7 +1681,7 @@ function startGame() {
   stopRhythm();
   buildAnswerButtons();
   updateHeader();
-  showLevelIntro(1);
+  showLevelIntro(startLevel);
 }
 
 function showLevelIntro(n) {
@@ -1687,6 +1765,7 @@ function triggerParticles(isLevelUp) {
 // ══════════════════════════════════════════════════════
 
 (function initApp() {
+  buildLevelChips();
   document.getElementById('btn-start').addEventListener('click', startGame);
   document.getElementById('btn-level-start').addEventListener('click', startChallenge);
   document.getElementById('btn-next').addEventListener('click', nextSong);
