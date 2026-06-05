@@ -733,355 +733,419 @@ const LEVELS = [
     desc: 'Master the two most common time signatures in all of music.',
   },
   {
-    level: 2, emoji: '🎸',
-    title: 'Beat Apprentice',
-    sigs: ['4/4', '3/4', '6/8'],
+    level: 2, emoji: '🎺',
+    title: 'March Cadet',
+    sigs: ['4/4', '3/4', '2/4'],
     xpNeeded: 6,
-    desc: 'Add compound duple time — six beats felt as two swaying groups of three.',
+    desc: 'Add march time — two quick beats per bar, the heartbeat of military bands and ragtime.',
   },
   {
-    level: 3, emoji: '🎹',
-    title: 'Meter Explorer',
-    sigs: ['4/4', '3/4', '6/8', '5/4'],
+    level: 3, emoji: '🎸',
+    title: 'Beat Apprentice',
+    sigs: ['4/4', '3/4', '2/4', '6/8'],
     xpNeeded: 8,
-    desc: 'Unlock quintuple meter — asymmetric and irresistibly off-kilter.',
+    desc: 'Enter compound time — six eighth notes felt as two swaying groups of three.',
   },
   {
-    level: 4, emoji: '🎼',
-    title: 'Polyrhythm Pro',
-    sigs: ['4/4', '3/4', '6/8', '5/4', '7/4'],
+    level: 4, emoji: '🎷',
+    title: 'Shuffle Detective',
+    sigs: ['4/4', '3/4', '6/8', '12/8'],
+    xpNeeded: 10,
+    desc: 'Distinguish compound duple from compound quadruple — the blues shuffle versus the Celtic gallop.',
+  },
+  {
+    level: 5, emoji: '🎹',
+    title: 'Meter Explorer',
+    sigs: ['4/4', '3/4', '6/8', '12/8', '5/4'],
+    xpNeeded: 10,
+    desc: 'Unlock quintuple meter — five beats, asymmetric and irresistibly off-kilter.',
+  },
+  {
+    level: 6, emoji: '🎼',
+    title: 'Polyrhythm Seeker',
+    sigs: ['4/4', '3/4', '6/8', '12/8', '5/4', '7/4'],
+    xpNeeded: 12,
+    desc: 'Add septuple meter — seven beats that lurch forward and never quite settle.',
+  },
+  {
+    level: 7, emoji: '🌊',
+    title: 'Odd Meter Adept',
+    sigs: ['4/4', '3/4', '6/8', '5/4', '7/4', '9/8', '7/8'],
+    xpNeeded: 14,
+    desc: 'Compound triple and Balkan asymmetry — the meters that define world music and progressive jazz.',
+  },
+  {
+    level: 8, emoji: '🎯',
+    title: 'Master of Time',
+    sigs: ['4/4', '3/4', '2/4', '6/8', '12/8', '5/4', '7/4', '9/8', '7/8'],
     xpNeeded: 999,
-    desc: 'The ultimate challenge: septuple meter, the groove that powers rock\'s most iconic riffs.',
+    desc: 'All nine signatures. No safety net. Pure ear training.',
   },
 ];
 
 const SIG_LABELS = {
   '4/4': 'Common Time',
   '3/4': 'Waltz Time',
+  '2/4': 'March Time',
   '6/8': 'Compound Duple',
+  '12/8': 'Blues Shuffle',
   '5/4': 'Quintuple',
   '7/4': 'Septuple',
+  '9/8': 'Compound Triple',
+  '7/8': 'Balkan Odd',
 };
 
 const SIG_EXPLANATIONS = {
-  '4/4': 'Four equal beats per bar. The strongest pulse in all of music — the default grid everything else departs from.',
+  '4/4': 'Four equal beats per bar. The bedrock of rock, pop, and classical — the pulse everything else is measured against.',
   '3/4': 'Three beats per bar. Beat 1 is heavy, beats 2 and 3 are light — the waltz lilt you feel before you think.',
-  '6/8': 'Six eighth notes in two compound groups of three. Feels like two big beats, each with a triplet subdivision — a rocking, galloping swing.',
-  '5/4': 'Five beats per bar — asymmetric and restless. Usually felt as 3+2 or 2+3, always one beat short of resolution.',
-  '7/4': 'Seven beats per bar — septuple meter. Groups as 4+3 or 3+2+2, creating a lurching forward momentum that never quite settles.',
+  '2/4': 'Two beats per bar — march time. Strong beat 1, answering beat 2. Twice the energy of 4/4 at the same tempo.',
+  '6/8': 'Six eighth notes in two compound groups of three. Two big beats with a built-in triplet subdivision — galloping and rocking.',
+  '12/8': 'Twelve eighth notes in four groups of three — compound quadruple time. The shuffle feel of the blues: four beats, each divided into a lazy triplet.',
+  '5/4': 'Five beats per bar — asymmetric and restless. Usually felt as 3+2 or 2+3, always one beat short of comfortable resolution.',
+  '7/4': 'Seven beats per bar — septuple meter. Groups as 4+3 or 3+4, creating a lurching forward momentum that never quite settles.',
+  '9/8': 'Nine eighth notes in three compound groups of three — compound triple time. Three big dotted-quarter beats, each subdivided into three. Rich and rolling.',
+  '7/8': 'Seven eighth notes per bar — Balkan odd meter. Grouped 2+2+3 or 3+2+2, it limps forward beautifully, landing slightly off where you expect.',
 };
 
 const SIG_HINTS = {
   '4/4': [
     'Count slowly: ONE-two-three-four, ONE-two-three-four. Does the groove reset every four beats?',
-    'Listen for the backbeat: snare or clap on beats 2 and 4. That one-TWO-three-FOUR pattern is the heartbeat of 4/4.',
+    'Listen for the backbeat: the accent on beats 2 and 4. That one-TWO-three-FOUR pattern is the heartbeat of 4/4.',
   ],
   '3/4': [
     'Count: ONE-two-three, ONE-two-three. Is there a strong first beat with two lighter beats after it?',
     'Feel the sway: DOWN-up-up, DOWN-up-up. Three-beat time has a pendulum quality — it leans and recovers.',
   ],
+  '2/4': [
+    'Count just two beats: ONE-two, ONE-two. It feels like marching — left-right, left-right. Short and punchy.',
+    'Two beats per bar means the downbeat comes twice as often as in 4/4. Everything snaps back quickly.',
+  ],
   '6/8': [
-    'Count six eighth notes: one-and-a-two-and-a. Two big beats, each divided into three — does the rhythm gallop or rock?',
-    'Compare: 6/8 feels like two triplets per bar, 3/4 feels like three quarter-notes. 6/8 swings more than 3/4 walks.',
+    'Count six eighth notes: one-and-a-two-and-a. Two big beats, each divided into three — does the rhythm gallop?',
+    '6/8 feels like two triplets per bar. Compare: 3/4 walks evenly, 6/8 swings and rocks.',
+  ],
+  '12/8': [
+    'Count four groups of three eighth notes: ONE-and-a-TWO-and-a-THREE-and-a-FOUR-and-a. Does it shuffle lazily?',
+    '12/8 and 6/8 both have triplet feel, but 12/8 has four big beats (not two). The blues shuffle is 12/8.',
   ],
   '5/4': [
-    'Count to five and listen for where the phrase "restarts": ONE-two-three-FOUR-five. Does it feel like 3+2 or 2+3?',
-    'Five beats never fully resolve like four. If counting to four feels one beat too short, you\'re in 5/4.',
+    'Count to five and listen for where the phrase restarts: ONE-two-three-FOUR-five. Does it feel like 3+2 or 2+3?',
+    'Five beats never fully resolve like four. Counting to four feels one beat too short — that\'s the tell.',
   ],
   '7/4': [
-    'Count seven: ONE-two-three-FOUR-five-six-seven. Try grouping as 4+3 — four steady beats then three.',
-    'Seven beats lurch forward. If the pattern feels almost-but-not-quite-even, you\'re likely in 7/4.',
+    'Count seven: ONE-two-three-FOUR-five-six-seven. Try grouping as 4+3 — four steady beats then three more.',
+    'Seven beats lurch forward. The pattern feels almost-but-not-quite even — one beat longer than 6/4.',
+  ],
+  '9/8': [
+    'Count nine eighth notes grouped as 3+3+3: ONE-and-a-TWO-and-a-THREE-and-a. Three compound beats.',
+    'Or try 2+2+2+3: ONE-two-THREE-four-FIVE-six-SEVEN-eight-nine. The extra "3" at the end is the signature.',
+  ],
+  '7/8': [
+    'Count seven eighth notes: ONE-two-THREE-four-FIVE-six-seven. Group as 2+2+3 — two pairs then a triplet.',
+    'Seven eighth notes creates a limping, asymmetric feel. It\'s shorter than 7/4 — bars rush by quickly.',
   ],
 };
 
 // Drum patterns: arrays of {kick, snare, hihat, accent} per 16th-note step
 // Each sig has an array of 2-3 pattern variants
+// COMPOUND_SIGS: steps are 8th notes (bpm = dotted-quarter); others use 16th notes
+const COMPOUND_SIGS = new Set(['6/8', '12/8', '9/8', '7/8']);
+
 const PATTERNS = {
+  // ── 4/4: 16 steps (16th notes) ──────────────────────
   '4/4': [
-    // classic rock
-    [
+    [ // classic rock — kick 1&3, snare 2&4
       {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
     ],
-    // funk
-    [
+    [ // funk — syncopated kick
       {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:1,s:0,h:0,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
       {k:1,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:1,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
     ],
+    [ // half-time feel
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
   ],
+  // ── 3/4: 12 steps (16th notes, 3 beats × 4) ─────────
   '3/4': [
-    // waltz (12 16th notes = 3 beats of 4 each)
-    [
+    [ // waltz
       {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
     ],
-    // jazz waltz
-    [
+    [ // jazz waltz
       {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:0,h:0,a:0},{k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:0,h:0,a:0},{k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:0,a:0},
     ],
+    [ // country waltz
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
   ],
+  // ── 2/4: 8 steps (16th notes, 2 beats × 4) ──────────
+  '2/4': [
+    [ // march
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+    ],
+    [ // march with inner kick
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:1,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    [ // polka
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:1,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+    ],
+  ],
+  // ── 6/8: 12 steps (8th notes, 2 compound beats × 6) ─
   '6/8': [
-    // compound gallop (12 8th subdivisions)
-    [
+    [ // gallop
       {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
     ],
-    // march feel
-    [
+    [ // march feel
       {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
       {k:1,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
     ],
+    [ // lilting
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
+    ],
   ],
+  // ── 12/8: 12 steps (8th notes, 4 compound beats × 3) ─
+  '12/8': [
+    [ // blues shuffle — kick on 1&3, snare on 2&4
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    [ // rock shuffle — sparse hihat
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+    ],
+    [ // gospel shuffle
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:1,h:0,a:0},{k:0,s:0,h:1,a:0},
+    ],
+  ],
+  // ── 5/4: 20 steps (16th notes, 5 beats × 4) ─────────
   '5/4': [
-    // 3+2 feel (20 16th notes)
-    [
+    [ // 3+2 feel
       {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
     ],
-    // 2+3 feel
-    [
+    [ // 2+3 feel
       {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    [ // jazz 5/4
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:1,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+    ],
+  ],
+  // ── 7/4: 28 steps (16th notes, 7 beats × 4) ─────────
+  '7/4': [
+    [ // 4+3 feel
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    [ // 3+2+2 feel
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
       {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:1,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
     ],
   ],
-  '7/4': [
-    // 4+3 feel (28 16th notes)
-    [
-      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+  // ── 9/8: 9 steps (8th notes, 3 compound beats × 3) ──
+  '9/8': [
+    [ // 3+3+3 equal compound triple
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
     ],
-    // 3+2+2 feel
-    [
-      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
-      {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:1,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
+    [ // 2+2+2+3 (Blue Rondo à la Turk feel)
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    [ // 3+2+2+2 variant
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+  ],
+  // ── 7/8: 7 steps (8th notes) ─────────────────────────
+  '7/8': [
+    [ // 2+2+3
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    [ // 3+2+2
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    [ // 2+3+2
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
     ],
   ],
 };
 
 const SONGS = [
-  // ── 4/4 ────────────────────────────────────────────
-  {
-    id: 'CeO-trAbi7U',
-    title: 'Symphony No.9 — Ode to Joy',
-    artist: 'Beethoven / Barenboim',
-    sig: '4/4',
-    explanation: 'Ode to Joy moves in steady groups of four. The melody falls on beat 1 each bar, making the four-beat cycle easy to feel.',
-    hints: [
-      'Tap your foot and count: ONE-two-three-four. Does the main melody restart every 4 taps?',
-      '"JOY-ful JOY-ful WE a-DORE thee" — those four syllables span exactly one bar of four beats.',
-    ],
-  },
-  {
-    id: '-tJYN-eG1zk',
-    title: 'We Will Rock You',
-    artist: 'Queen',
-    sig: '4/4',
-    explanation: '"We Will Rock You" is built on a boom-boom-clap that repeats every 4 beats — pure, driving 4/4.',
-    hints: [
-      'Stamp stamp clap: ONE-two-THREE-four. The clap always falls on beat 3.',
-      'This is the most common time signature in rock. The pattern is so steady it locks in instantly.',
-    ],
-  },
-  {
-    id: 'pAgnJDJN4VA',
-    title: 'Back in Black',
-    artist: 'AC/DC',
-    sig: '4/4',
-    explanation: 'AC/DC\'s anthem drives in 4/4 — the guitar riff completes every four beats, with the snare on 2 and 4.',
-    hints: [
-      'Listen for the snare on beats 2 and 4: one-TWO-three-FOUR.',
-      'The guitar riff loops in fours — tap your foot four times and you\'ll hear it restart.',
-    ],
-  },
-  {
-    id: 'fEiJwgcawvI',
-    title: 'Symphony No.9 — Finale (Karajan)',
-    artist: 'Beethoven / Berliner Philharmoniker',
-    sig: '4/4',
-    explanation: 'The mighty finale of Beethoven\'s 9th marches in 4/4 — four powerful beats per bar throughout.',
-    hints: [
-      'Count the choir: one-two-three-four. The bass line reinforces beat 1 every four counts.',
-      '"Freu-de schö-ner Göt-ter-fun-ken" — each syllable cluster fills one bar of four.',
-    ],
-  },
+  // ── 4/4 ──────────────────────────────────────────────
+  { sig:'4/4', title:'Symphony No.9 — Ode to Joy',         artist:'Beethoven' },
+  { sig:'4/4', title:'We Will Rock You',                    artist:'Queen' },
+  { sig:'4/4', title:'Back in Black',                       artist:'AC/DC' },
+  { sig:'4/4', title:'Symphony No.9 — Finale',             artist:'Beethoven' },
+  { sig:'4/4', title:'Smells Like Teen Spirit',             artist:'Nirvana' },
+  { sig:'4/4', title:'Bohemian Rhapsody',                   artist:'Queen' },
+  { sig:'4/4', title:'Hey Jude',                            artist:'The Beatles' },
+  { sig:'4/4', title:'Born to Run',                         artist:'Bruce Springsteen' },
+  { sig:'4/4', title:'Africa',                              artist:'Toto' },
+  { sig:'4/4', title:'Lose Yourself',                       artist:'Eminem' },
+  { sig:'4/4', title:'Hotel California (verses)',           artist:'Eagles' },
+  { sig:'4/4', title:'Purple Rain',                         artist:'Prince' },
+  { sig:'4/4', title:'Stairway to Heaven (rock section)',   artist:'Led Zeppelin' },
+  { sig:'4/4', title:'Under Pressure',                      artist:'Queen & David Bowie' },
+  { sig:'4/4', title:'Heroes',                              artist:'David Bowie' },
+  { sig:'4/4', title:'Another Brick in the Wall',           artist:'Pink Floyd' },
+  { sig:'4/4', title:'Ring of Fire',                        artist:'Johnny Cash' },
+  { sig:'4/4', title:'Get Lucky',                           artist:'Daft Punk' },
+  { sig:'4/4', title:'Symphony No.5 — I. Allegro',         artist:'Beethoven' },
+  { sig:'4/4', title:'Thriller',                            artist:'Michael Jackson' },
 
-  // ── 3/4 ────────────────────────────────────────────
-  {
-    id: 'IDaJ7rFg66A',
-    title: 'The Blue Danube',
-    artist: 'André Rieu / Johann Strauss',
-    sig: '3/4',
-    explanation: '"The Blue Danube" is the quintessential waltz — three beats per bar, strong on 1, light on 2 and 3.',
-    hints: [
-      'Sway: ONE-two-three, ONE-two-three. The first beat carries the weight, the next two float.',
-      'Imagine couples waltzing — that triple spin is exactly what 3/4 feels like.',
-    ],
-  },
-  {
-    id: 'Zp1aDnVySf8',
-    title: 'Waltz of the Flowers',
-    artist: 'Tchaikovsky / Concertgebouworkest',
-    sig: '3/4',
-    explanation: 'Tchaikovsky\'s Waltz of the Flowers is a textbook 3/4 waltz — three beats per bar, with a sweeping ONE-two-three throughout.',
-    hints: [
-      'Feel the swooping shape of the melody: it rises and falls in groups of three — ONE-two-three.',
-      'The strings carry the waltz pulse. Listen for the bass note on beat 1 and two lighter beats after.',
-    ],
-  },
-  {
-    id: 'SUT_0c2QVzo',
-    title: 'Waltz in C♯ Minor, Op.64 No.2',
-    artist: 'Chopin',
-    sig: '3/4',
-    explanation: 'Chopin\'s waltzes are all in 3/4 — the left-hand bass-chord-chord pattern locks in the three-beat cycle.',
-    hints: [
-      'Hear the piano left hand: BASS-chord-chord, BASS-chord-chord. That\'s three beats.',
-      'Beat 1 is strongest (bass note); beats 2 and 3 are lighter (chords). Classic waltz meter.',
-    ],
-  },
-  {
-    id: 'trDOwHzEqMY',
-    title: 'Complete Waltzes (selection)',
-    artist: 'Chopin',
-    sig: '3/4',
-    explanation: 'Every Chopin waltz is in 3/4. The flowing lilt you hear is the three-beat cycle repeating.',
-    hints: [
-      'Count three steady beats per measure throughout. Beat 1 is always the heaviest.',
-      'The left-hand pattern — bass then two chords — is the unmistakable signature of 3/4 waltz time.',
-    ],
-  },
+  // ── 3/4 ──────────────────────────────────────────────
+  { sig:'3/4', title:'The Blue Danube',                     artist:'Johann Strauss II' },
+  { sig:'3/4', title:'Waltz of the Flowers',                artist:'Tchaikovsky' },
+  { sig:'3/4', title:'Waltz in C♯ Minor, Op.64 No.2',      artist:'Chopin' },
+  { sig:'3/4', title:'Piano Man',                           artist:'Billy Joel' },
+  { sig:'3/4', title:'My Favorite Things',                  artist:'Rodgers & Hammerstein' },
+  { sig:'3/4', title:'Amazing Grace',                       artist:'Traditional' },
+  { sig:'3/4', title:'Scarborough Fair',                    artist:'Traditional / Simon & Garfunkel' },
+  { sig:'3/4', title:'Moonlight Sonata — Mvt. 2 (Allegretto)', artist:'Beethoven' },
+  { sig:'3/4', title:'Edelweiss',                           artist:'Rodgers & Hammerstein' },
+  { sig:'3/4', title:'Take Me Out to the Ball Game',        artist:'Traditional' },
+  { sig:'3/4', title:'Für Elise (opening theme)',           artist:'Beethoven' },
+  { sig:'3/4', title:'Manic Street Preachers — If You Tolerate This', artist:'Manic Street Preachers' },
+  { sig:'3/4', title:'Blackbird',                           artist:'The Beatles' },
 
-  // ── 6/8 ────────────────────────────────────────────
-  {
-    id: 'WMJTycleWrc',
-    title: 'When Johnny Comes Marching Home',
-    artist: 'West Point Band',
-    sig: '6/8',
-    explanation: 'This Civil War march is a textbook 6/8 — the galloping feel comes from two strong beats per bar, each divided into three.',
-    hints: [
-      'The rhythm gallops: ONE-and-a-TWO-and-a. Two main pulses, each felt as a group of three.',
-      '"When JOHN-ny comes MAR-ching home" — JOHN and MAR land on the two strong beats of 6/8.',
-    ],
-  },
-  {
-    id: 'tAGnKpE4NCI',
-    title: 'Nothing Else Matters',
-    artist: 'Metallica',
-    sig: '6/8',
-    explanation: '"Nothing Else Matters" is in 6/8 — the opening solo guitar arpeggio flows in two groups of three, creating its hypnotic compound feel.',
-    hints: [
-      'Listen to the opening guitar: six notes per bar grouped ONE-and-a-TWO-and-a. Two big beats, each in three.',
-      'The ballad-like sway you feel is 6/8\'s compound duple meter — two pulses, each subdivided into triplets.',
-    ],
-  },
-  {
-    id: 'h5AqgjzlGp8',
-    title: 'Greensleeves',
-    artist: 'Karliene',
-    sig: '6/8',
-    explanation: 'Greensleeves flows in 6/8 — its haunting, swaying quality comes from two compound beats dividing into three each.',
-    hints: [
-      'Feel two "rocking" beats per bar: ONE-and-a-TWO-and-a.',
-      'The pickup note "A-" on "Alas" lands on the last third of beat 2, then beat 1 falls on "my".',
-    ],
-  },
+  // ── 2/4 ──────────────────────────────────────────────
+  { sig:'2/4', title:'Turkish March (Ruins of Athens)',     artist:'Beethoven' },
+  { sig:'2/4', title:'Stars and Stripes Forever',           artist:'John Philip Sousa' },
+  { sig:'2/4', title:'The Entertainer',                     artist:'Scott Joplin' },
+  { sig:'2/4', title:'March (Nutcracker Suite)',            artist:'Tchaikovsky' },
+  { sig:'2/4', title:'Can Can',                             artist:'Offenbach' },
+  { sig:'2/4', title:'Radetzky March',                      artist:'Johann Strauss Sr.' },
+  { sig:'2/4', title:'Hungarian Dance No.5',                artist:'Brahms' },
+  { sig:'2/4', title:'Maple Leaf Rag',                      artist:'Scott Joplin' },
+  { sig:'2/4', title:'Washington Post March',               artist:'John Philip Sousa' },
+  { sig:'2/4', title:'Wedding March (Alla Marcia)',         artist:'Mendelssohn' },
 
-  // ── 5/4 ────────────────────────────────────────────
-  {
-    id: 'PHdU5sHigYQ',
-    title: 'Take Five',
-    artist: 'Dave Brubeck Quartet',
-    sig: '5/4',
-    explanation: '"Take Five" is the most famous 5/4 composition — five beats per bar, often felt as 3+2, creating its signature asymmetric swing.',
-    hints: [
-      'Count to five: ONE-two-three-FOUR-five. Notice where the phrase wants to split.',
-      'The piano left hand plays a repeating five-beat loop: 1-2-3 | 1-2. Count along with it.',
-    ],
-  },
-  {
-    id: 'kXl0F9oF92E',
-    title: '15 Step (From the Basement)',
-    artist: 'Radiohead',
-    sig: '5/4',
-    explanation: '"15 Step" from In Rainbows locks into a modern electronic groove in 5/4 — five beats that always feel one beat too many.',
-    hints: [
-      'Count the groove: ONE-two-three-FOUR-five, repeat. It never quite resolves like 4/4.',
-      'Try clapping beats 1 and 4. Those two claps anchor the five-beat pulse throughout.',
-    ],
-  },
-  {
-    id: 'xZfIUz1S97U',
-    title: 'Mars, the Bringer of War',
-    artist: 'Holst / Danish National Symphony',
-    sig: '5/4',
-    explanation: 'Holst\'s "Mars" is in 5/4 — the relentless five-beat war march creates its ominous, unstoppable momentum.',
-    hints: [
-      'The heavy march: ONE-two-three-FOUR-five, hammering forward. Five steps instead of the expected four.',
-      'Feel the asymmetry — 3+2 or 2+3. The five-beat cycle is what makes it sound so threatening and inevitable.',
-    ],
-  },
+  // ── 6/8 ──────────────────────────────────────────────
+  { sig:'6/8', title:'When Johnny Comes Marching Home',     artist:'West Point Band' },
+  { sig:'6/8', title:'Nothing Else Matters',                artist:'Metallica' },
+  { sig:'6/8', title:'Greensleeves',                        artist:'Traditional' },
+  { sig:'6/8', title:'We Are the Champions',                artist:'Queen' },
+  { sig:'6/8', title:'House of the Rising Sun',             artist:'The Animals' },
+  { sig:'6/8', title:'Norwegian Wood',                      artist:'The Beatles' },
+  { sig:'6/8', title:'Hava Nagila',                         artist:'Traditional' },
+  { sig:'6/8', title:'For He\'s a Jolly Good Fellow',       artist:'Traditional' },
+  { sig:'6/8', title:'O Christmas Tree (O Tannenbaum)',     artist:'Traditional' },
+  { sig:'6/8', title:'Row, Row, Row Your Boat',             artist:'Traditional' },
+  { sig:'6/8', title:'Simple Gifts',                        artist:'Traditional Shaker Hymn' },
+  { sig:'6/8', title:'The Irish Washerwoman',               artist:'Traditional Irish Jig' },
 
-  // ── 7/4 ────────────────────────────────────────────
-  {
-    id: '-0kcet4aPpQ',
-    title: 'Money',
-    artist: 'Pink Floyd',
-    sig: '7/4',
-    explanation: '"Money" opens with a cash-register loop in 7/4 — Pink Floyd built one of rock\'s most recognisable septuple grooves.',
-    hints: [
-      'Count the bass riff: ONE-two-three-FOUR-five-six-seven. The cycle restarts on 1.',
-      'Group it as 4+3: four steady beats then three more. The bass line makes the seven-beat cycle unmistakable.',
-    ],
-  },
-  {
-    id: '_OO2PuGz-H8',
-    title: 'Solsbury Hill',
-    artist: 'Peter Gabriel',
-    sig: '7/4',
-    explanation: 'Peter Gabriel\'s debut single is in 7/4 — the acoustic guitar strums a repeating seven-beat pattern throughout.',
-    hints: [
-      'Count the guitar: 1-2-3-4-5-6-7, then restart. The phrase feels "almost complete" — one beat short of 8.',
-      'Think 4+3: four beats then three. The phrase has forward momentum because it never fully settles.',
-    ],
-  },
-  {
-    id: 'lbdEzRfbeH4',
-    title: 'Unsquare Dance',
-    artist: 'Dave Brubeck',
-    sig: '7/4',
-    explanation: '"Unsquare Dance" lives up to its name — a hand-clapping groove built entirely in 7/4.',
-    hints: [
-      'The hand claps accent beats 1, 3, 5, and 7. Count all seven beats between each clap.',
-      'Brubeck called it "unsquare" because 7 divides as 2+2+3, refusing to settle into even groups.',
-    ],
-  },
+  // ── 12/8 ─────────────────────────────────────────────
+  { sig:'12/8', title:'Johnny B. Goode',                    artist:'Chuck Berry' },
+  { sig:'12/8', title:'Gimme Shelter',                      artist:'The Rolling Stones' },
+  { sig:'12/8', title:'La Bamba',                           artist:'Ritchie Valens / Traditional' },
+  { sig:'12/8', title:'Hound Dog',                          artist:'Elvis Presley' },
+  { sig:'12/8', title:'Can\'t Help Falling in Love',        artist:'Elvis Presley' },
+  { sig:'12/8', title:'Sweet Home Chicago',                 artist:'Robert Johnson / Blues tradition' },
+  { sig:'12/8', title:'La Grange',                          artist:'ZZ Top' },
+  { sig:'12/8', title:'The Thrill Is Gone',                 artist:'B.B. King' },
+  { sig:'12/8', title:'Pride and Joy',                      artist:'Stevie Ray Vaughan' },
+  { sig:'12/8', title:'Mannish Boy',                        artist:'Muddy Waters' },
+
+  // ── 5/4 ──────────────────────────────────────────────
+  { sig:'5/4', title:'Take Five',                           artist:'Dave Brubeck Quartet' },
+  { sig:'5/4', title:'15 Step',                             artist:'Radiohead' },
+  { sig:'5/4', title:'Mars, the Bringer of War',            artist:'Holst' },
+  { sig:'5/4', title:'Living in the Past',                  artist:'Jethro Tull' },
+  { sig:'5/4', title:'Everything in Its Right Place',       artist:'Radiohead' },
+  { sig:'5/4', title:'Quintuple meter groove',              artist:'Dave Brubeck' },
+  { sig:'5/4', title:'Limelight (bridge)',                  artist:'Rush' },
+  { sig:'5/4', title:'Prelude in 5/4',                      artist:'Various Classical' },
+
+  // ── 7/4 ──────────────────────────────────────────────
+  { sig:'7/4', title:'Money',                               artist:'Pink Floyd' },
+  { sig:'7/4', title:'Solsbury Hill',                       artist:'Peter Gabriel' },
+  { sig:'7/4', title:'Unsquare Dance',                      artist:'Dave Brubeck' },
+  { sig:'7/4', title:'All You Need Is Love (verse)',        artist:'The Beatles' },
+  { sig:'7/4', title:'Paranoid Android (middle section)',   artist:'Radiohead' },
+  { sig:'7/4', title:'Peaceful Easy Feeling (bridge)',      artist:'Eagles' },
+  { sig:'7/4', title:'Late (septuple groove)',              artist:'Various Jazz' },
+  { sig:'7/4', title:'Brubeck in Seven',                    artist:'Dave Brubeck' },
+
+  // ── 9/8 ──────────────────────────────────────────────
+  { sig:'9/8', title:'Blue Rondo à la Turk',               artist:'Dave Brubeck Quartet' },
+  { sig:'9/8', title:'Gallows Pole (compound triple)',      artist:'Traditional / Led Zeppelin' },
+  { sig:'9/8', title:'Nine to the Bar',                     artist:'Jazz / Traditional' },
+  { sig:'9/8', title:'Ballade No.1 (inner sections)',       artist:'Chopin' },
+  { sig:'9/8', title:'Rondo alla Turca (compound feel)',    artist:'Mozart' },
+  { sig:'9/8', title:'Compound triple groove',              artist:'Dave Brubeck' },
+  { sig:'9/8', title:'Mission Hill (folk 9/8)',             artist:'Traditional Celtic' },
+
+  // ── 7/8 ──────────────────────────────────────────────
+  { sig:'7/8', title:'Schism (verses)',                     artist:'Tool' },
+  { sig:'7/8', title:'The Ocean (riff section)',            artist:'Led Zeppelin' },
+  { sig:'7/8', title:'Tchariga (Bulgarian wedding dance)',  artist:'Traditional Bulgarian' },
+  { sig:'7/8', title:'Macedonian dance',                    artist:'Traditional Balkan' },
+  { sig:'7/8', title:'Odd meter study',                     artist:'Various Prog Rock' },
+  { sig:'7/8', title:'Seven Nation (riff in 7)',            artist:'Balkan Jazz tradition' },
+  { sig:'7/8', title:'Asymmetric Waltz',                    artist:'Balkan folk tradition' },
 ];
 
 // ══════════════════════════════════════════════════════
@@ -1186,16 +1250,12 @@ function scheduleRhythm() {
       setTimeout(() => pulseBeat(acc), d);
     })(delay, isAccent);
 
-    // Advance time: 16th note duration for most sigs; 8th note for 6/8
-    const is68 = rhythmSig === '6/8';
-    const beatsPerBar = parseInt(rhythmSig);  // numerator
-    const stepsPerBar = rhythmPattern.length;
+    // Compound sigs: steps are 8th notes (bpm = dotted quarter = 3 eighths)
+    // Simple sigs: steps are 16th notes (bpm = quarter note)
     const secondsPerBeat = 60 / rhythmBpm;
-    // For 6/8: pattern steps are 8th notes at compound quarter = bpm
-    // For others: steps are 16th notes
-    const stepDur = is68
-      ? secondsPerBeat / 3          // 8th note at triplet feel
-      : secondsPerBeat / 4;         // 16th note
+    const stepDur = COMPOUND_SIGS.has(rhythmSig)
+      ? secondsPerBeat / 3    // 8th note
+      : secondsPerBeat / 4;   // 16th note
 
     nextNoteTime += stepDur;
     rhythmStep++;
@@ -1225,8 +1285,13 @@ function startRhythm(sig) {
   rhythmPattern  = variants[Math.floor(Math.random() * variants.length)];
   rhythmSig      = sig;
   // Randomise BPM slightly per sig for variety
-  const bpmRanges = { '4/4':[88,116], '3/4':[72,100], '6/8':[72,96], '5/4':[72,96], '7/4':[66,88] };
-  const [lo, hi]  = bpmRanges[sig] || [80, 100];
+  const bpmRanges = {
+    '4/4':[88,118], '3/4':[72,104], '2/4':[96,130],
+    '6/8':[72,100], '12/8':[60,88],
+    '5/4':[72,96],  '7/4':[66,88],
+    '9/8':[60,84],  '7/8':[80,110],
+  };
+  const [lo, hi] = bpmRanges[sig] || [80, 100];
   rhythmBpm       = lo + Math.floor(Math.random() * (hi - lo + 1));
   rhythmStep      = 0;
 
@@ -1461,7 +1526,7 @@ function nextSong() {
 }
 
 function checkLevelUp() {
-  if (STATE.level >= 4) return false;
+  if (STATE.level >= LEVELS.length) return false;
   if (STATE.xp >= currentLvl().xpNeeded) {
     doLevelUp();
     return true;
