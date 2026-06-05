@@ -566,6 +566,117 @@
       70%  { box-shadow: 0 0 0 7px rgba(232,201,109,0); }
       100% { box-shadow: 0 0 0 0 rgba(232,201,109,0); }
     }
+    @keyframes pulse-ring {
+      0%   { transform: scale(1);    opacity: 0.7; }
+      100% { transform: scale(1.55); opacity: 0; }
+    }
+
+    /* ─── mode picker ─────────────────────────────────── */
+    #mode-picker {
+      display: flex;
+      background: var(--surface);
+      border-radius: var(--r-pill);
+      border: 1px solid var(--border);
+      padding: 3px;
+      gap: 2px;
+      animation: fade-in-up 0.5s 0.2s var(--ease-out) both;
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 9px 10px;
+      border-radius: var(--r-pill);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: background 0.18s, color 0.18s;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .mode-btn.active { background: var(--accent); color: #000; }
+
+    /* ─── rhythm player ──────────────────────────────── */
+    #rhythm-player {
+      display: none;
+      position: absolute;
+      inset: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: var(--surface);
+    }
+    #rhythm-player.visible { display: flex; }
+
+    #beat-pulse-wrap {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #beat-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #beat-ring.fire { animation: pulse-ring 0.32s ease-out forwards; }
+    #beat-pulse {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 3px solid var(--border);
+      transition: transform 0.07s var(--spring), border-color 0.07s, background 0.07s;
+    }
+    #beat-pulse.accent {
+      transform: scale(1.2);
+      border-color: var(--accent);
+      background: rgba(232,201,109,0.18);
+    }
+    #beat-pulse.beat {
+      transform: scale(1.08);
+      border-color: var(--text-muted);
+      background: var(--surface-2);
+    }
+    #rhythm-bpm {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+    #btn-rhythm-toggle {
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 10px 28px;
+      border-radius: var(--r-pill);
+      background: var(--accent);
+      color: #000;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform 0.12s, opacity 0.12s;
+    }
+    #btn-rhythm-toggle:active { transform: scale(0.96); opacity: 0.88; }
+
+    /* ─── song meta hidden state ─────────────────────── */
+    .song-hidden { color: var(--text-muted) !important; font-style: italic; font-weight: 400 !important; }
+
+    /* ─── revealed song info in feedback ─────────────── */
+    #feedback-song-reveal {
+      display: none;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
+    #feedback-song-reveal.visible { display: block; }
+    #feedback-song-reveal strong { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -578,7 +689,13 @@
     <div id="intro-logo">BeatRead</div>
     <p id="intro-tagline">Can you hear the beat?</p>
     <p id="intro-desc">Train your ear to recognise time signatures<br>by listening to real music.</p>
-    <div style="height:28px"></div>
+    <div style="height:16px"></div>
+    <div id="mode-picker">
+      <button class="mode-btn active" data-mode="mixed">🎲 Mixed</button>
+      <button class="mode-btn" data-mode="music">🎵 Music</button>
+      <button class="mode-btn" data-mode="rhythm">🥁 Rhythm</button>
+    </div>
+    <div style="height:20px"></div>
     <button class="btn-primary" id="btn-start" style="margin:0 32px;width:auto">
       Start Training
     </button>
@@ -634,6 +751,14 @@
             Watch on YouTube ↗
           </a>
         </div>
+        <div id="rhythm-player">
+          <div id="beat-pulse-wrap">
+            <div id="beat-ring"></div>
+            <div id="beat-pulse"></div>
+          </div>
+          <div id="rhythm-bpm">— BPM</div>
+          <button id="btn-rhythm-toggle">▶ Play</button>
+        </div>
       </div>
       <div id="answer-grid"></div>
     </div>
@@ -649,7 +774,8 @@
     <span id="feedback-xp" style="display:none">+2 XP</span>
   </div>
   <p id="feedback-text"></p>
-  <button class="btn-primary hidden" id="btn-next">Next Song →</button>
+  <div id="feedback-song-reveal"></div>
+  <button class="btn-primary hidden" id="btn-next">Next →</button>
 </div>
 
 <!-- ── Level Up Overlay (fixed, outside #app) ──────────── -->
@@ -707,6 +833,128 @@ const SIG_LABELS = {
   '6/8': 'Compound Duple',
   '5/4': 'Quintuple',
   '7/4': 'Septuple',
+};
+
+const SIG_EXPLANATIONS = {
+  '4/4': 'Four equal beats per bar. The strongest pulse in all of music — the default grid everything else departs from.',
+  '3/4': 'Three beats per bar. Beat 1 is heavy, beats 2 and 3 are light — the waltz lilt you feel before you think.',
+  '6/8': 'Six eighth notes in two compound groups of three. Feels like two big beats, each with a triplet subdivision — a rocking, galloping swing.',
+  '5/4': 'Five beats per bar — asymmetric and restless. Usually felt as 3+2 or 2+3, always one beat short of resolution.',
+  '7/4': 'Seven beats per bar — septuple meter. Groups as 4+3 or 3+2+2, creating a lurching forward momentum that never quite settles.',
+};
+
+const SIG_HINTS = {
+  '4/4': [
+    'Count slowly: ONE-two-three-four, ONE-two-three-four. Does the groove reset every four beats?',
+    'Listen for the backbeat: snare or clap on beats 2 and 4. That one-TWO-three-FOUR pattern is the heartbeat of 4/4.',
+  ],
+  '3/4': [
+    'Count: ONE-two-three, ONE-two-three. Is there a strong first beat with two lighter beats after it?',
+    'Feel the sway: DOWN-up-up, DOWN-up-up. Three-beat time has a pendulum quality — it leans and recovers.',
+  ],
+  '6/8': [
+    'Count six eighth notes: one-and-a-two-and-a. Two big beats, each divided into three — does the rhythm gallop or rock?',
+    'Compare: 6/8 feels like two triplets per bar, 3/4 feels like three quarter-notes. 6/8 swings more than 3/4 walks.',
+  ],
+  '5/4': [
+    'Count to five and listen for where the phrase "restarts": ONE-two-three-FOUR-five. Does it feel like 3+2 or 2+3?',
+    'Five beats never fully resolve like four. If counting to four feels one beat too short, you\'re in 5/4.',
+  ],
+  '7/4': [
+    'Count seven: ONE-two-three-FOUR-five-six-seven. Try grouping as 4+3 — four steady beats then three.',
+    'Seven beats lurch forward. If the pattern feels almost-but-not-quite-even, you\'re likely in 7/4.',
+  ],
+};
+
+// Drum patterns: arrays of {kick, snare, hihat, accent} per 16th-note step
+// Each sig has an array of 2-3 pattern variants
+const PATTERNS = {
+  '4/4': [
+    // classic rock
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    // funk
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:1,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:1,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+    ],
+  ],
+  '3/4': [
+    // waltz (12 16th notes = 3 beats of 4 each)
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+    ],
+    // jazz waltz
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:0,a:0},{k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:0,a:0},{k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:0,a:0},
+    ],
+  ],
+  '6/8': [
+    // compound gallop (12 8th subdivisions)
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    // march feel
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:0,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:0,a:0},
+    ],
+  ],
+  '5/4': [
+    // 3+2 feel (20 16th notes)
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    // 2+3 feel
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:1,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+  ],
+  '7/4': [
+    // 4+3 feel (28 16th notes)
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+    // 3+2+2 feel
+    [
+      {k:1,s:0,h:1,a:1},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:1,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},
+      {k:0,s:0,h:1,a:0},{k:0,s:0,h:1,a:0},{k:1,s:1,h:1,a:0},{k:0,s:0,h:1,a:0},
+    ],
+  ],
 };
 
 const SONGS = [
@@ -918,11 +1166,15 @@ const STATE = {
   score: 0,
   streak: 0,
   currentSong: null,
+  currentSig: null,     // correct answer for both modes
   hintsUsed: 0,
   answeredCorrectly: false,
   revealed: false,
   seenSongIds: new Set(),
   lastSongSig: null,
+  mode: 'mixed',        // 'music' | 'rhythm' | 'mixed'
+  isRhythm: false,      // true when current challenge is a rhythm pattern
+  rhythmPlaying: false,
 };
 
 function currentLvl() { return LEVELS[STATE.level - 1]; }
@@ -950,7 +1202,7 @@ window.onYouTubeIframeAPIReady = function () {
     events: {
       onReady: function (e) {
         ytReady = true;
-        if (pendingId) {
+        if (pendingId !== null) {
           e.target.loadVideoById(pendingId);
           pendingId = null;
         }
@@ -962,15 +1214,15 @@ window.onYouTubeIframeAPIReady = function () {
   });
 };
 
-function loadVideo(id) {
+function loadVideo(id, startSeconds) {
   document.getElementById('player-error').classList.remove('visible');
-  // Restore iframe visibility for new video
   const iframe = document.querySelector('#player-wrap iframe');
   if (iframe) iframe.style.visibility = '';
+  const opts = startSeconds ? { videoId: id, startSeconds } : id;
   if (ytReady && ytPlayer) {
-    ytPlayer.loadVideoById(id);
+    ytPlayer.loadVideoById(opts);
   } else {
-    pendingId = id;
+    pendingId = opts;
   }
 }
 
@@ -982,6 +1234,150 @@ function showPlayerError(song) {
   const iframe = document.querySelector('#player-wrap iframe');
   if (iframe) iframe.style.visibility = 'hidden';
   el.classList.add('visible');
+}
+
+// ══════════════════════════════════════════════════════
+//  WEB AUDIO RHYTHM ENGINE
+// ══════════════════════════════════════════════════════
+
+let audioCtx = null;
+let rhythmTimer = null;
+let rhythmStep = 0;
+let rhythmPattern = null;
+let rhythmBpm = 96;
+let rhythmSig = null;
+const LOOKAHEAD_MS   = 25.0;
+const SCHEDULE_AHEAD = 0.1; // seconds
+let nextNoteTime = 0.0;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playKick(ctx, time) {
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.frequency.setValueAtTime(150, time);
+  osc.frequency.exponentialRampToValueAtTime(0.001, time + 0.5);
+  gain.gain.setValueAtTime(1.2, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.5);
+  osc.start(time); osc.stop(time + 0.5);
+}
+
+function playSnare(ctx, time) {
+  const bufSize = ctx.sampleRate * 0.12;
+  const buf  = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
+  const src  = ctx.createBufferSource();
+  const gain = ctx.createGain();
+  const filt = ctx.createBiquadFilter();
+  filt.type = 'bandpass'; filt.frequency.value = 2400; filt.Q.value = 0.8;
+  src.buffer = buf;
+  src.connect(filt); filt.connect(gain); gain.connect(ctx.destination);
+  gain.gain.setValueAtTime(0.55, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+  src.start(time); src.stop(time + 0.12);
+}
+
+function playHihat(ctx, time, accent) {
+  const bufSize = ctx.sampleRate * 0.06;
+  const buf  = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
+  const src  = ctx.createBufferSource();
+  const gain = ctx.createGain();
+  const filt = ctx.createBiquadFilter();
+  filt.type = 'highpass'; filt.frequency.value = 7000;
+  src.buffer = buf;
+  src.connect(filt); filt.connect(gain); gain.connect(ctx.destination);
+  const vol = accent ? 0.28 : 0.12;
+  gain.gain.setValueAtTime(vol, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
+  src.start(time); src.stop(time + 0.06);
+}
+
+function scheduleRhythm() {
+  const ctx = getAudioCtx();
+  while (nextNoteTime < ctx.currentTime + SCHEDULE_AHEAD) {
+    const step = rhythmPattern[rhythmStep % rhythmPattern.length];
+    const isBarStart = rhythmStep % rhythmPattern.length === 0;
+
+    if (step.k) playKick(ctx, nextNoteTime);
+    if (step.s) playSnare(ctx, nextNoteTime);
+    if (step.h) playHihat(ctx, nextNoteTime, step.a || isBarStart);
+
+    // Visual pulse — schedule via timeout offset from now
+    const delay = Math.max(0, (nextNoteTime - ctx.currentTime) * 1000);
+    const isAccent = step.a || isBarStart;
+    (function(d, acc) {
+      setTimeout(() => pulseBeat(acc), d);
+    })(delay, isAccent);
+
+    // Advance time: 16th note duration for most sigs; 8th note for 6/8
+    const is68 = rhythmSig === '6/8';
+    const beatsPerBar = parseInt(rhythmSig);  // numerator
+    const stepsPerBar = rhythmPattern.length;
+    const secondsPerBeat = 60 / rhythmBpm;
+    // For 6/8: pattern steps are 8th notes at compound quarter = bpm
+    // For others: steps are 16th notes
+    const stepDur = is68
+      ? secondsPerBeat / 3          // 8th note at triplet feel
+      : secondsPerBeat / 4;         // 16th note
+
+    nextNoteTime += stepDur;
+    rhythmStep++;
+  }
+}
+
+function pulseBeat(isAccent) {
+  const pulse = document.getElementById('beat-pulse');
+  const ring  = document.getElementById('beat-ring');
+  if (!pulse || !STATE.rhythmPlaying) return;
+
+  pulse.classList.remove('accent', 'beat');
+  void pulse.offsetWidth;
+  pulse.classList.add(isAccent ? 'accent' : 'beat');
+  setTimeout(() => pulse.classList.remove('accent', 'beat'), 160);
+
+  if (isAccent && ring) {
+    ring.classList.remove('fire');
+    void ring.offsetWidth;
+    ring.classList.add('fire');
+  }
+}
+
+function startRhythm(sig) {
+  stopRhythm();
+  const variants = PATTERNS[sig];
+  rhythmPattern  = variants[Math.floor(Math.random() * variants.length)];
+  rhythmSig      = sig;
+  // Randomise BPM slightly per sig for variety
+  const bpmRanges = { '4/4':[88,116], '3/4':[72,100], '6/8':[72,96], '5/4':[72,96], '7/4':[66,88] };
+  const [lo, hi]  = bpmRanges[sig] || [80, 100];
+  rhythmBpm       = lo + Math.floor(Math.random() * (hi - lo + 1));
+  rhythmStep      = 0;
+
+  const ctx = getAudioCtx();
+  nextNoteTime = ctx.currentTime + 0.1;
+  STATE.rhythmPlaying = true;
+  rhythmTimer = setInterval(scheduleRhythm, LOOKAHEAD_MS);
+
+  document.getElementById('rhythm-bpm').textContent = rhythmBpm + ' BPM';
+  document.getElementById('btn-rhythm-toggle').textContent = '⏹ Stop';
+}
+
+function stopRhythm() {
+  if (rhythmTimer) { clearInterval(rhythmTimer); rhythmTimer = null; }
+  STATE.rhythmPlaying = false;
+  rhythmStep = 0;
+  const pulse = document.getElementById('beat-pulse');
+  if (pulse) pulse.classList.remove('accent', 'beat');
+  const btn = document.getElementById('btn-rhythm-toggle');
+  if (btn) btn.textContent = '▶ Play';
 }
 
 // ══════════════════════════════════════════════════════
@@ -1107,7 +1503,7 @@ function resetButtons() {
 
 function handleAnswer(sig) {
   if (STATE.answeredCorrectly || STATE.revealed) return;
-  if (sig === STATE.currentSong.sig) {
+  if (sig === STATE.currentSig) {
     handleCorrect();
   } else {
     handleWrong(sig);
@@ -1116,8 +1512,9 @@ function handleAnswer(sig) {
 
 function handleCorrect() {
   STATE.answeredCorrectly = true;
+  stopRhythm();
 
-  const btn = document.querySelector(`.answer-btn[data-sig="${STATE.currentSong.sig}"]`);
+  const btn = document.querySelector(`.answer-btn[data-sig="${STATE.currentSig}"]`);
   if (btn) { btn.style.animation = ''; btn.classList.add('correct'); }
 
   const firstTry = STATE.hintsUsed === 0;
@@ -1132,10 +1529,25 @@ function handleCorrect() {
   updateHeader();
   triggerParticles(false);
 
+  const explanation = STATE.isRhythm
+    ? SIG_EXPLANATIONS[STATE.currentSig]
+    : STATE.currentSong.explanation;
+
+  // Reveal song title if it was hidden
+  revealSongMeta();
+
+  const revealEl = document.getElementById('feedback-song-reveal');
+  if (STATE.isRhythm && STATE.currentSong) {
+    revealEl.innerHTML = 'This pattern is from: <strong>' + STATE.currentSong.title + '</strong> — ' + STATE.currentSong.artist;
+    revealEl.classList.add('visible');
+  } else {
+    revealEl.classList.remove('visible');
+  }
+
   showFeedback(
     'success',
     '✓ Correct!',
-    STATE.currentSong.explanation,
+    explanation,
     '+' + xpGain + ' XP  +' + points + ' pts'
   );
 }
@@ -1147,24 +1559,55 @@ function handleWrong(sig) {
   const btn = document.querySelector(`.answer-btn[data-sig="${sig}"]`);
   if (btn) { btn.style.animation = ''; btn.classList.add('wrong'); btn.disabled = true; }
 
-  if (STATE.hintsUsed < STATE.currentSong.hints.length) {
-    const hint = STATE.currentSong.hints[STATE.hintsUsed];
+  const hints = STATE.isRhythm ? SIG_HINTS[STATE.currentSig] : STATE.currentSong.hints;
+
+  if (STATE.hintsUsed < hints.length) {
+    const hint = hints[STATE.hintsUsed];
     STATE.hintsUsed++;
     showFeedback(
       'hint',
-      '💡 Hint ' + STATE.hintsUsed + ' of ' + STATE.currentSong.hints.length,
+      '💡 Hint ' + STATE.hintsUsed + ' of ' + hints.length,
       hint
     );
   } else {
     STATE.revealed = true;
-    const correctBtn = document.querySelector(`.answer-btn[data-sig="${STATE.currentSong.sig}"]`);
+    stopRhythm();
+    const correctBtn = document.querySelector(`.answer-btn[data-sig="${STATE.currentSig}"]`);
     if (correctBtn) { correctBtn.style.animation = ''; correctBtn.classList.add('correct'); }
-    showFeedback('reveal', '🔍 Answer', STATE.currentSong.explanation);
+
+    const explanation = STATE.isRhythm
+      ? SIG_EXPLANATIONS[STATE.currentSig]
+      : STATE.currentSong.explanation;
+
+    revealSongMeta();
+
+    const revealEl = document.getElementById('feedback-song-reveal');
+    if (STATE.isRhythm && STATE.currentSong) {
+      revealEl.innerHTML = 'Pattern from: <strong>' + STATE.currentSong.title + '</strong> — ' + STATE.currentSong.artist;
+      revealEl.classList.add('visible');
+    } else {
+      revealEl.classList.remove('visible');
+    }
+
+    showFeedback('reveal', '🔍 Answer: ' + STATE.currentSig, explanation);
   }
+}
+
+function revealSongMeta() {
+  const titleEl  = document.getElementById('song-title');
+  const artistEl = document.getElementById('song-artist');
+  if (STATE.currentSong) {
+    titleEl.textContent = STATE.currentSong.title;
+    artistEl.textContent = STATE.currentSong.artist;
+  }
+  titleEl.classList.remove('song-hidden');
+  artistEl.classList.remove('song-hidden');
 }
 
 function nextSong() {
   if (STATE.currentSong) STATE.seenSongIds.add(STATE.currentSong.id);
+  stopRhythm();
+  document.getElementById('feedback-song-reveal').classList.remove('visible');
   hideFeedback();
 
   // Check level up BEFORE starting next challenge
@@ -1215,20 +1658,76 @@ function dismissLevelUp() {
   startChallenge();
 }
 
+function pickMode() {
+  if (STATE.mode === 'music')  return 'music';
+  if (STATE.mode === 'rhythm') return 'rhythm';
+  // mixed: alternate or random, avoid same twice in a row
+  return Math.random() < 0.5 ? 'rhythm' : 'music';
+}
+
 function startChallenge() {
-  STATE.currentSong       = pickSong();
   STATE.hintsUsed         = 0;
   STATE.answeredCorrectly = false;
   STATE.revealed          = false;
-  STATE.lastSongSig       = STATE.currentSong.sig;
 
-  document.getElementById('song-title').textContent  = STATE.currentSong.title;
-  document.getElementById('song-artist').textContent = STATE.currentSong.artist;
+  const chosenMode = pickMode();
+  STATE.isRhythm = (chosenMode === 'rhythm');
+
+  STATE.currentSong = pickSong();
+  STATE.currentSig  = STATE.currentSong.sig;
+  STATE.lastSongSig = STATE.currentSig;
 
   resetButtons();
   hideFeedback();
-  loadVideo(STATE.currentSong.id);
+  document.getElementById('feedback-song-reveal').classList.remove('visible');
+
+  const titleEl  = document.getElementById('song-title');
+  const artistEl = document.getElementById('song-artist');
+  const ytWrap   = document.getElementById('yt-player');
+  const rhythmEl = document.getElementById('rhythm-player');
+
+  if (STATE.isRhythm) {
+    // Rhythm mode: hide song identity, show beat player
+    titleEl.textContent  = 'Listen to the rhythm…';
+    artistEl.textContent = 'What time signature is this?';
+    titleEl.classList.add('song-hidden');
+    artistEl.classList.remove('song-hidden');
+    rhythmEl.classList.add('visible');
+    document.getElementById('player-error').classList.remove('visible');
+    const iframe = document.querySelector('#player-wrap iframe');
+    if (iframe) iframe.style.visibility = 'hidden';
+    document.getElementById('btn-rhythm-toggle').textContent = '▶ Play';
+    document.getElementById('rhythm-bpm').textContent = '— BPM';
+    STATE.rhythmPlaying = false;
+  } else {
+    // Music mode: hide title until answered
+    titleEl.textContent  = '♩  ♩  ♩';
+    artistEl.textContent = 'What time signature is this?';
+    titleEl.classList.add('song-hidden');
+    artistEl.classList.remove('song-hidden');
+    rhythmEl.classList.remove('visible');
+    const iframe = document.querySelector('#player-wrap iframe');
+    if (iframe) iframe.style.visibility = '';
+    // Random start time (skip first 15s, max 90s in)
+    const startSec = 15 + Math.floor(Math.random() * 75);
+    loadVideo(STATE.currentSong.id, startSec);
+  }
+
   showScreen('challenge');
+}
+
+function startGame() {
+  Object.assign(STATE, {
+    level: 1, xp: 0, score: 0, streak: 0,
+    currentSong: null, currentSig: null,
+    hintsUsed: 0, answeredCorrectly: false, revealed: false,
+    seenSongIds: new Set(), lastSongSig: null,
+    isRhythm: false, rhythmPlaying: false,
+  });
+  stopRhythm();
+  buildAnswerButtons();
+  updateHeader();
+  showLevelIntro(1);
 }
 
 function showLevelIntro(n) {
@@ -1252,17 +1751,6 @@ function showLevelIntro(n) {
   showScreen('level-intro');
 }
 
-function startGame() {
-  Object.assign(STATE, {
-    level: 1, xp: 0, score: 0, streak: 0,
-    currentSong: null, hintsUsed: 0,
-    answeredCorrectly: false, revealed: false,
-    seenSongIds: new Set(), lastSongSig: null,
-  });
-  buildAnswerButtons();
-  updateHeader();
-  showLevelIntro(1);
-}
 
 // ══════════════════════════════════════════════════════
 //  PARTICLES
@@ -1327,6 +1815,24 @@ function triggerParticles(isLevelUp) {
   document.getElementById('btn-level-start').addEventListener('click', startChallenge);
   document.getElementById('btn-next').addEventListener('click', nextSong);
   document.getElementById('btn-continue').addEventListener('click', dismissLevelUp);
+
+  // Mode picker
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      STATE.mode = btn.dataset.mode;
+    });
+  });
+
+  // Rhythm play/stop toggle
+  document.getElementById('btn-rhythm-toggle').addEventListener('click', () => {
+    if (STATE.rhythmPlaying) {
+      stopRhythm();
+    } else {
+      startRhythm(STATE.currentSig);
+    }
+  });
 })();
 </script>
 <script src="https://www.youtube.com/iframe_api"></script>
