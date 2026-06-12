@@ -356,6 +356,15 @@
       transition: transform 0.12s, opacity 0.12s;
     }
     #btn-rhythm-toggle:active { transform: scale(0.96); opacity: 0.88; }
+    #audio-hint {
+      font-family: var(--font-body);
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--secondary);
+      text-align: center;
+      max-width: 280px;
+    }
+    #audio-hint.hidden { display: none; }
 
     /* ─── answer grid ───────────────────────────────────── */
     #answer-grid {
@@ -739,6 +748,7 @@
         </div>
         <div id="rhythm-bpm">— BPM</div>
         <button id="btn-rhythm-toggle">▶ Play</button>
+        <div id="audio-hint" class="hidden">🔇 No sound? Tap Play again — or open this page in Chrome/Safari instead of the in-app browser for full audio support.</div>
       </div>
       <div id="answer-grid"></div>
     </div>
@@ -1234,9 +1244,22 @@ const LOOKAHEAD_MS   = 25.0;
 const SCHEDULE_AHEAD = 0.1; // seconds
 let nextNoteTime = 0.0;
 
+let audioUnlocked = false;
+
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (!audioUnlocked) {
+    // "Unlock" the audio graph for mobile in-app browsers (WhatsApp/Instagram/
+    // Messenger webviews) that report state:'running' but stay silent until a
+    // sound is actually played synchronously inside the user-gesture call stack.
+    const buf = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+    audioUnlocked = true;
+  }
   return audioCtx;
 }
 
@@ -1647,6 +1670,7 @@ function startChallenge() {
   document.getElementById('song-artist').classList.remove('song-hidden');
   document.getElementById('btn-rhythm-toggle').textContent = '▶ Play';
   document.getElementById('rhythm-bpm').textContent = '— BPM';
+  document.getElementById('audio-hint').classList.add('hidden');
   STATE.rhythmPlaying = false;
 
   showScreen('challenge');
@@ -1776,6 +1800,12 @@ function triggerParticles(isLevelUp) {
       stopRhythm();
     } else {
       startRhythm(STATE.currentSig);
+      const ctx = getAudioCtx();
+      const hint = document.getElementById('audio-hint');
+      ctx.resume().then(() => {
+        if (ctx.state === 'running') hint.classList.add('hidden');
+        else hint.classList.remove('hidden');
+      });
     }
   });
 })();
