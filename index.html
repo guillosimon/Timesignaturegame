@@ -748,7 +748,10 @@
         </div>
         <div id="rhythm-bpm">— BPM</div>
         <button id="btn-rhythm-toggle">▶ Play</button>
-        <div id="audio-hint" class="hidden">🔇 No sound? Tap Play again — or open this page in Chrome/Safari instead of the in-app browser for full audio support.</div>
+        <div id="audio-hint" class="hidden">🔇 No sound? Check the mute switch on the side of your iPhone is off, then tap Play again. If you're in WhatsApp, try opening this page in Safari instead.</div>
+        <audio id="ios-audio-unlock" preload="auto" playsinline style="display:none">
+          <source src="data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAACA" type="audio/wav">
+        </audio>
       </div>
       <div id="answer-grid"></div>
     </div>
@@ -1258,6 +1261,13 @@ function getAudioCtx() {
     src.buffer = buf;
     src.connect(audioCtx.destination);
     src.start(0);
+
+    // Playing a silent <audio> element switches iOS/WebKit to the "playback"
+    // audio session category, so Web Audio output is no longer silenced by
+    // the physical mute/silent switch on iPhones.
+    const iosUnlock = document.getElementById('ios-audio-unlock');
+    if (iosUnlock) iosUnlock.play().catch(() => {});
+
     audioUnlocked = true;
   }
   return audioCtx;
