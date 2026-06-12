@@ -749,9 +749,7 @@
         <div id="rhythm-bpm">— BPM</div>
         <button id="btn-rhythm-toggle">▶ Play</button>
         <div id="audio-hint" class="hidden">🔇 No sound? Check the mute switch on the side of your iPhone is off, then tap Play again. If you're in WhatsApp, try opening this page in Safari instead.</div>
-        <audio id="ios-audio-unlock" preload="auto" playsinline loop style="display:none">
-          <source src="data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAACA" type="audio/wav">
-        </audio>
+        <audio id="ios-audio-unlock" preload="auto" playsinline loop style="display:none"></audio>
       </div>
       <div id="answer-grid"></div>
     </div>
@@ -1249,6 +1247,32 @@ let nextNoteTime = 0.0;
 
 let audioUnlocked = false;
 
+// Build a 1-second silent WAV as a blob URL. (A clip of only a few samples
+// would loop thousands of times per second, which triggers iOS's
+// autoplay-abuse throttling and silences the page entirely.)
+function buildSilentAudioURL() {
+  const sampleRate = 8000;
+  const numSamples = sampleRate; // 1 second
+  const buf  = new ArrayBuffer(44 + numSamples);
+  const view = new DataView(buf);
+  const writeStr = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + numSamples, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);          // PCM
+  view.setUint16(22, 1, true);          // mono
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate, true); // byte rate
+  view.setUint16(32, 1, true);          // block align
+  view.setUint16(34, 8, true);          // bits per sample
+  writeStr(36, 'data');
+  view.setUint32(40, numSamples, true);
+  for (let i = 0; i < numSamples; i++) view.setUint8(44 + i, 128); // silence
+  return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+}
+
 // Playing a looping silent <audio> element switches iOS/WebKit to the
 // "playback" audio session category, so Web Audio output is no longer
 // silenced by the physical mute/silent switch on iPhones. Host apps like
@@ -1258,7 +1282,9 @@ let audioUnlocked = false;
 // backgrounded or closed).
 function unlockIOSAudio() {
   const iosUnlock = document.getElementById('ios-audio-unlock');
-  if (iosUnlock && iosUnlock.paused) iosUnlock.play().catch(() => {});
+  if (!iosUnlock) return;
+  if (!iosUnlock.src) iosUnlock.src = buildSilentAudioURL();
+  if (iosUnlock.paused) iosUnlock.play().catch(() => {});
 }
 
 document.addEventListener('visibilitychange', () => {
